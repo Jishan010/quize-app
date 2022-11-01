@@ -24,7 +24,9 @@ class MyApp extends StatelessWidget {
     locationBuilder: RoutesLocationBuilder(
       routes: {
         '/': (context, state, data) => const WelcomeScreen(),
-        '/questions': (context, state, data) {
+        '/questions/:questionId': (context, state, data) {
+          final questionId = state.pathParameters['questionId'];
+
           CustomLinkedListNode? currentNode;
           CustomLinkedList customLinkedList = CustomLinkedList();
           // Take the path parameter of interest from BeamState
@@ -39,12 +41,18 @@ class MyApp extends StatelessWidget {
             list.forEach((element) {
               customLinkedList.add(element);
             });
-            currentNode = customLinkedList.head;
+            //head can be used to pass the data to the next page
+            CustomLinkedListNode? headNode = customLinkedList.head;
+            currentNode = headNode;
+            questionId == headNode?.value.id.toString();
           } else {
             currentNode = data as CustomLinkedListNode?;
           }
+          //return beamPage with animation
+
           return BeamPage(
-            key: ValueKey(currentNode?.value.id),
+            key: ValueKey('question-$questionId'),
+            type: BeamPageType.slideRightTransition,
             child: QuestionsPage(currentNode: currentNode),
           );
         },
@@ -84,7 +92,7 @@ class WelcomeScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   // Basic beaming
-                  Beamer.of(context).beamToNamed('/questions');
+                  Beamer.of(context).beamToNamed('/questions/0');
                 },
                 child: Text('Questions'),
               ),

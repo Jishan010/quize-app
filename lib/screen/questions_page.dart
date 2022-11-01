@@ -33,12 +33,10 @@ class _QuestionsPageState extends State<QuestionsPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (currentNode?.previous != null) {
-              Beamer.of(context).beamToNamed(
-                '/questions',
-                data: currentNode?.previous,
-              );
+              //beamer back navigation with transition animation
+              Beamer.of(context).beamBack(data: currentNode?.previous);
             } else {
-              Beamer.of(context).beamToNamed('/');
+              Beamer.of(context).beamBack();
             }
           },
         ),
@@ -46,19 +44,22 @@ class _QuestionsPageState extends State<QuestionsPage> {
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          Text(currentNode?.value.question ?? ''),
+          Text(
+              '${currentNode?.value.id}: ${currentNode?.value.question}' ?? ''),
           const SizedBox(
             height: 20,
           ),
           ElevatedButton(
             onPressed: () {
               if (currentNode?.next != null) {
+                final questionId = currentNode?.next?.value.id;
                 Beamer.of(context).beamToNamed(
-                  '/questions',
+                  '/questions/$questionId',
                   data: currentNode?.next,
                 );
               } else {
-                Beamer.of(context).beamToNamed('/');
+                //TODO: show the result
+                /*Beamer.of(context).beamToNamed('/finish');*/
               }
             },
             child: currentNode?.next != null
