@@ -5,19 +5,19 @@ import 'package:quize_app/entity/Questions.dart';
 import '../utility/custom_linked_list.dart';
 
 class QuestionsPage extends StatefulWidget {
-  QuestionsPage({Key? key, required this.currentNode}) : super(key: key);
+  QuestionsPage({Key? key, required this.questionList}) : super(key: key);
 
-  CustomLinkedListNode? currentNode;
+  List<Question> questionList;
 
   @override
   State<QuestionsPage> createState() =>
-      _QuestionsPageState(currentNode: currentNode);
+      _QuestionsPageState(questionList: questionList);
 }
 
 class _QuestionsPageState extends State<QuestionsPage> {
-  CustomLinkedListNode? currentNode;
+  List<Question> questionList;
 
-  _QuestionsPageState({required this.currentNode});
+  _QuestionsPageState({required this.questionList});
 
   @override
   void initState() {
@@ -32,42 +32,38 @@ class _QuestionsPageState extends State<QuestionsPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            if (currentNode?.previous != null) {
-              //beamer back navigation with transition animation
-              Beamer.of(context).beamBack(data: currentNode?.previous);
-            } else {
-              Beamer.of(context).beamBack();
-            }
+            Beamer.of(context).beamBack();
           },
         ),
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          Text(
-              '${currentNode?.value.id}: ${currentNode?.value.question}' ?? ''),
-          const SizedBox(
-            height: 20,
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (currentNode?.next != null) {
-                final questionId = currentNode?.next?.value.id;
-                Beamer.of(context).beamToNamed(
-                  '/questions/$questionId',
-                  data: currentNode?.next,
-                );
-              } else {
-                //TODO: show the result
-                /*Beamer.of(context).beamToNamed('/finish');*/
-              }
+          Expanded(
+              child: PageView.builder(
+            itemBuilder: (context, index) {
+              return BuildQuestion(
+                question: questionList[index],
+              );
             },
-            child: currentNode?.next != null
-                ? const Text('Next')
-                : const Text('Finish'),
-          ),
+            itemCount: questionList.length,
+          )),
         ],
       ),
     );
   }
+}
+
+Column BuildQuestion({required Question question}) {
+  return Column(
+    children: [
+      Text(question.question),
+      ...question.options
+          .map((e) => ElevatedButton(
+                onPressed: () {},
+                child: Text(e),
+              ))
+          .toList()
+    ],
+  );
 }

@@ -1,10 +1,7 @@
-import 'dart:ffi';
-
 import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:quize_app/entity/Questions.dart';
 import 'package:quize_app/screen/questions_page.dart';
-import 'package:quize_app/utility/custom_linked_list.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,36 +21,49 @@ class MyApp extends StatelessWidget {
     locationBuilder: RoutesLocationBuilder(
       routes: {
         '/': (context, state, data) => const WelcomeScreen(),
-        '/questions/:questionId': (context, state, data) {
-          final questionId = state.pathParameters['questionId'];
-
-          CustomLinkedListNode? currentNode;
-          CustomLinkedList customLinkedList = CustomLinkedList();
-          // Take the path parameter of interest from BeamState
-          if (null == data) {
-            List<Question> list = sample_data
-                .map((item) => Question(
-                      id: item['id'],
-                      question: item['question'],
-                    ))
-                .toList();
-
-            list.forEach((element) {
-              customLinkedList.add(element);
-            });
-            //head can be used to pass the data to the next page
-            CustomLinkedListNode? headNode = customLinkedList.head;
-            currentNode = headNode;
-            questionId == headNode?.value.id.toString();
-          } else {
-            currentNode = data as CustomLinkedListNode?;
-          }
-          //return beamPage with animation
+        '/questions': (context, state, data) {
+          final questionList = [
+            Question(
+                id: 1,
+                question: 'What is the capital of India?',
+                options: ['Delhi', 'Mumbai', 'Kolkata', 'Chennai'],
+                answer: 0),
+            Question(
+                id: 2,
+                question: 'What is the capital of USA?',
+                options: [
+                  'New York',
+                  'Washington DC',
+                  'Chicago',
+                  'Los Angeles'
+                ],
+                answer: 0),
+            Question(
+                id: 3,
+                question: 'What is the capital of Canada?',
+                options: ['Toronto', 'Vancouver', 'Montreal', 'Ottawa'],
+                answer: 0),
+            Question(
+                id: 4,
+                question: 'What is the capital of Australia?',
+                options: ['Sydney', 'Melbourne', 'Brisbane', 'Canberra'],
+                answer: 0),
+            Question(
+                id: 5,
+                question: 'What is the capital of Brazil?',
+                options: [
+                  'Rio de Janeiro',
+                  'Sao Paulo',
+                  'Brasilia',
+                  'Salvador'
+                ],
+                answer: 0),
+          ];
 
           return BeamPage(
-            key: ValueKey('question-$questionId'),
+            key: ValueKey('questions'),
             type: BeamPageType.slideRightTransition,
-            child: QuestionsPage(currentNode: currentNode),
+            child: QuestionsPage(questionList: questionList),
           );
         },
       },
@@ -92,7 +102,7 @@ class WelcomeScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   // Basic beaming
-                  Beamer.of(context).beamToNamed('/questions/0');
+                  Beamer.of(context).beamToNamed('/questions');
                 },
                 child: Text('Questions'),
               ),
