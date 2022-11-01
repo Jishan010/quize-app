@@ -4,6 +4,7 @@ import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:quize_app/entity/Questions.dart';
 import 'package:quize_app/screen/questions_page.dart';
+import 'package:quize_app/utility/custom_linked_list.dart';
 
 void main() {
   runApp(MyApp());
@@ -23,19 +24,29 @@ class MyApp extends StatelessWidget {
     locationBuilder: RoutesLocationBuilder(
       routes: {
         '/': (context, state, data) => const WelcomeScreen(),
-        '/questions/:questionsId': (context, state, data) {
+        '/questions': (context, state, data) {
+          CustomLinkedListNode? currentNode;
+          CustomLinkedList customLinkedList = CustomLinkedList();
           // Take the path parameter of interest from BeamState
-          final questionsId = state.pathParameters['questionsId']!;
-          List<Question> list = sample_data
-              .map((item) => Question(
-                    id: item['id'],
-                    question: item['question'],
-                  ))
-              .toList();
+          if (null == data) {
+            List<Question> list = sample_data
+                .map((item) => Question(
+                      id: item['id'],
+                      question: item['question'],
+                    ))
+                .toList();
 
-          return QuestionsPage(
-              question: list[int.parse(questionsId)],
-              id: int.parse(questionsId));
+            list.forEach((element) {
+              customLinkedList.add(element);
+            });
+            currentNode = customLinkedList.head;
+          } else {
+            currentNode = data as CustomLinkedListNode?;
+          }
+          return BeamPage(
+            key: ValueKey(currentNode?.value.id),
+            child: QuestionsPage(currentNode: currentNode),
+          );
         },
       },
     ),
@@ -73,7 +84,7 @@ class WelcomeScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   // Basic beaming
-                  Beamer.of(context).beamToNamed('/questions/0');
+                  Beamer.of(context).beamToNamed('/questions');
                 },
                 child: Text('Questions'),
               ),

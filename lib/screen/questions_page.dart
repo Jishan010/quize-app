@@ -2,23 +2,22 @@ import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:quize_app/entity/Questions.dart';
 
-class QuestionsPage extends StatefulWidget {
-  QuestionsPage({Key? key, required this.question, required this.id})
-      : super(key: key);
+import '../utility/custom_linked_list.dart';
 
-  final Question question;
-  int id = 0;
+class QuestionsPage extends StatefulWidget {
+  QuestionsPage({Key? key, required this.currentNode}) : super(key: key);
+
+  CustomLinkedListNode? currentNode;
 
   @override
   State<QuestionsPage> createState() =>
-      _QuestionsPageState(question: question, id: id);
+      _QuestionsPageState(currentNode: currentNode);
 }
 
 class _QuestionsPageState extends State<QuestionsPage> {
-  final Question question;
-  int id = 0;
+  CustomLinkedListNode? currentNode;
 
-  _QuestionsPageState({required this.question, required this.id});
+  _QuestionsPageState({required this.currentNode});
 
   @override
   void initState() {
@@ -33,11 +32,13 @@ class _QuestionsPageState extends State<QuestionsPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            if (id == 0) {
-              context.beamToNamed('/');
+            if (currentNode?.previous != null) {
+              Beamer.of(context).beamToNamed(
+                '/questions',
+                data: currentNode?.previous,
+              );
             } else {
-              id--;
-              Beamer.of(context).beamToNamed('/questions/$id');
+              Beamer.of(context).beamToNamed('/');
             }
           },
         ),
@@ -45,17 +46,24 @@ class _QuestionsPageState extends State<QuestionsPage> {
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          Text(question.question),
+          Text(currentNode?.value.question ?? ''),
           const SizedBox(
             height: 20,
           ),
           ElevatedButton(
             onPressed: () {
-              if (id < 3) {
-                Beamer.of(context).beamToNamed('/questions/${id + 1}');
+              if (currentNode?.next != null) {
+                Beamer.of(context).beamToNamed(
+                  '/questions',
+                  data: currentNode?.next,
+                );
+              } else {
+                Beamer.of(context).beamToNamed('/');
               }
             },
-            child: id == 3 ? const Text('Finish') : const Text('Next'),
+            child: currentNode?.next != null
+                ? const Text('Next')
+                : const Text('Finish'),
           ),
         ],
       ),
