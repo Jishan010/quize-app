@@ -4,8 +4,6 @@ import 'package:beamer/beamer.dart';
 import 'package:flutter/material.dart';
 import 'package:quize_app/entity/Questions.dart';
 
-import '../utility/custom_linked_list.dart';
-
 class QuestionsPage extends StatefulWidget {
   QuestionsPage({Key? key, required this.questionList}) : super(key: key);
 
@@ -18,12 +16,65 @@ class QuestionsPage extends StatefulWidget {
 
 class _QuestionsPageState extends State<QuestionsPage> {
   List<Question> questionList;
+  int _currentQuestion = 0;
+  late PageController _pageController;
 
   _QuestionsPageState({required this.questionList});
 
   @override
   void initState() {
+    _pageController = PageController(initialPage: 0);
     super.initState();
+  }
+
+  ElevatedButton buildNextOrSubmitButton() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        primary: Colors.blue,
+        onPrimary: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+      onPressed: () {
+        if (_currentQuestion < questionList.length - 1) {
+          _pageController.nextPage(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeIn);
+          setState(() {
+            _currentQuestion++;
+          });
+        } else {
+          Beamer.of(context)
+              .beamToNamed('/questions/result', data: questionList);
+        }
+      },
+      child: Text(
+          _currentQuestion < questionList.length - 1 ? 'Next Page' : 'Submit'),
+    );
+  }
+
+  ElevatedButton buildPreviousButton() {
+    return ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(Colors.red),
+        shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0))),
+      ),
+      onPressed: () {
+        if (_currentQuestion > 0) {
+          _pageController.previousPage(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeIn);
+          setState(() {
+            _currentQuestion--;
+          });
+        } else {
+          Beamer.of(context).beamBack();
+        }
+      },
+      child: Text('Prev'),
+    );
   }
 
   @override
@@ -49,7 +100,19 @@ class _QuestionsPageState extends State<QuestionsPage> {
               );
             },
             itemCount: questionList.length,
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
           )),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              buildPreviousButton(),
+              buildNextOrSubmitButton(),
+            ],
+          ),
+          SizedBox(
+            height: 20,
+          )
         ],
       ),
     );
@@ -73,7 +136,7 @@ class _BuildQuestionState extends State<BuildQuestion> {
         const SizedBox(
           height: 20,
         ),
-        Text(widget.question.question,
+        Text('${widget.question.id}. ${widget.question.question}',
             style: const TextStyle(
               fontSize: 20,
             )),
@@ -85,7 +148,7 @@ class _BuildQuestionState extends State<BuildQuestion> {
           onOptionSelected: (option) {
             print(option);
             setState(() {
-              widget.question.answer = option;
+              widget.question.userAnswer = option;
             });
           },
         ),
@@ -123,7 +186,7 @@ class _OptionWidgetState extends State<OptionWidget> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                       border: Border.all(
-                          color: option == widget.question.answer
+                          color: option == widget.question.userAnswer
                               ? Colors.green
                               : Colors.white),
                       borderRadius: BorderRadius.circular(10)),
