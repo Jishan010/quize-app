@@ -2,7 +2,7 @@ class Question {
   final int id;
   final String question;
   final List<String> options;
-  int answer;
+  String answer;
 
   Question(
       {required this.id,

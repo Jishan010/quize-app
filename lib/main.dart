@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
                 id: 1,
                 question: 'What is the capital of India?',
                 options: ['Delhi', 'Mumbai', 'Kolkata', 'Chennai'],
-                answer: 0),
+                answer: ''),
             Question(
                 id: 2,
                 question: 'What is the capital of USA?',
@@ -37,17 +37,17 @@ class MyApp extends StatelessWidget {
                   'Chicago',
                   'Los Angeles'
                 ],
-                answer: 0),
+                answer: ''),
             Question(
                 id: 3,
                 question: 'What is the capital of Canada?',
                 options: ['Toronto', 'Vancouver', 'Montreal', 'Ottawa'],
-                answer: 0),
+                answer: ''),
             Question(
                 id: 4,
                 question: 'What is the capital of Australia?',
                 options: ['Sydney', 'Melbourne', 'Brisbane', 'Canberra'],
-                answer: 0),
+                answer: ''),
             Question(
                 id: 5,
                 question: 'What is the capital of Brazil?',
@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
                   'Brasilia',
                   'Salvador'
                 ],
-                answer: 0),
+                answer: ''),
           ];
 
           return BeamPage(
